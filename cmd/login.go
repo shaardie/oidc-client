@@ -18,9 +18,11 @@ package cmd
 import (
 	"context"
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -36,6 +38,7 @@ var (
 	tokenClaimsParameter   []string
 	userinfoClaimsParamter []string
 	showIDToken            bool
+	insecureTLS            bool
 )
 
 // loginCmd represents the login command
@@ -45,6 +48,9 @@ var loginCmd = &cobra.Command{
 	Long: `Login using the OIDC Login flow.
 This command is highly customizable via the command line parameter.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if insecureTLS {
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		}
 		provider, err := oidc.NewProvider(context.TODO(), issuer)
 		if err != nil {
 			fmt.Printf("unable to create oidc provider, %v\n", err)
@@ -142,5 +148,5 @@ func init() {
 	loginCmd.Flags().StringArrayVarP(&tokenClaimsParameter, "token-claim", "", nil, "Additional token claims")
 	loginCmd.Flags().StringArrayVarP(&userinfoClaimsParamter, "userinfo-claim", "", nil, "Additional userinfo claims")
 	loginCmd.Flags().BoolVarP(&showIDToken, "show-id-token", "", false, "Show the id token")
-
+	loginCmd.Flags().BoolVarP(&insecureTLS, "insecure-tls", "", false, "Disable tls checks")
 }
