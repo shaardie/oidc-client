@@ -74,18 +74,18 @@ This command is highly customizable via the command line parameter.`,
 
 		u, err := url.Parse(oauth2Config.RedirectURL)
 		if err != nil {
-			fmt.Printf("return unable to parse redirect url, %v\n", err)
+			fmt.Printf("unable to parse redirect url, %v\n", err)
 			os.Exit(1)
 		}
 		code, err := utils.HandleRedirect(context.Background(), u, state)
 		if err != nil {
-			fmt.Printf("return unable to parse redirect url, %v\n", err)
+			fmt.Printf("unable to handle redirect, %v\n", err)
 			os.Exit(1)
 		}
 
 		oauth2Token, err := oauth2Config.Exchange(context.TODO(), code)
 		if err != nil {
-			fmt.Printf("return unable to get token, %v\n", err)
+			fmt.Printf("unable to get token, %v\n", err)
 			os.Exit(1)
 		}
 		rawIDToken, ok := oauth2Token.Extra("id_token").(string)
